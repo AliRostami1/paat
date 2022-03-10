@@ -78,8 +78,8 @@ func TestCellParser(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, "1", strContent)
 
-	assert.Equal(t, 1, primitiveCell.Width)
-	assert.Equal(t, 1, primitiveCell.Height)
+	assert.Equal(t, 3, primitiveCell.Width)
+	assert.Equal(t, 3, primitiveCell.Height)
 
 	// ======================================
 
@@ -115,8 +115,8 @@ func TestPrimitiveParser(t *testing.T) {
 		assert.Equal(t, testData.firstField, strContent)
 
 		assert.Equal(t, PrimitiveCell, primitiveCell1.Type)
-		assert.Equal(t, 6, primitiveCell1.Width)
-		assert.Equal(t, 1, primitiveCell1.Height)
+		assert.Equal(t, 8, primitiveCell1.Width)
+		assert.Equal(t, 3, primitiveCell1.Height)
 
 		primitiveCell2 := &Cell{
 			ParentTable: nil,
@@ -135,8 +135,8 @@ func TestPrimitiveParser(t *testing.T) {
 		assert.Equal(t, fmt.Sprint(testData.seconField), strContent)
 
 		assert.Equal(t, PrimitiveCell, primitiveCell2.Type)
-		assert.Equal(t, 1, primitiveCell2.Width)
-		assert.Equal(t, 1, primitiveCell2.Height)
+		assert.Equal(t, 3, primitiveCell2.Width)
+		assert.Equal(t, 3, primitiveCell2.Height)
 
 		primitiveCell3 := &Cell{
 			ParentTable: nil,
@@ -155,8 +155,8 @@ func TestPrimitiveParser(t *testing.T) {
 		assert.Equal(t, fmt.Sprint(testData.thirdField), strContent)
 
 		assert.Equal(t, PrimitiveCell, primitiveCell3.Type)
-		assert.Equal(t, 3, primitiveCell3.Width)
-		assert.Equal(t, 1, primitiveCell3.Height)
+		assert.Equal(t, 5, primitiveCell3.Width)
+		assert.Equal(t, 3, primitiveCell3.Height)
 	}
 
 }
@@ -188,20 +188,20 @@ func TestStructParser(t *testing.T) {
 		for colIndex, col := range row {
 			t.Logf("row:%d col:%d = %v", rowIndex, colIndex, *col)
 			assert.NotNil(t, col)
-			assert.Equal(t, 10, col.Width)
-			assert.Equal(t, 1, col.Height)
+			assert.Equal(t, 12, col.Width)
+			assert.Equal(t, 3, col.Height)
 		}
 	}
 
-	assert.Equal(t, "firstField", table.Cells[0][0].Content) // width 10
-	assert.Equal(t, "seconField", table.Cells[0][1].Content) // width 11
-	assert.Equal(t, "thirdField", table.Cells[0][2].Content) // width 10
-	assert.Equal(t, "field1", table.Cells[1][0].Content)     // width 1
-	assert.Equal(t, "1", table.Cells[1][1].Content)          // width 1
-	assert.Equal(t, "2.1", table.Cells[1][2].Content)        // width 3
+	assert.Equal(t, "firstField", table.Cells[0][0].Content) // width 12
+	assert.Equal(t, "seconField", table.Cells[0][1].Content) // width 13
+	assert.Equal(t, "thirdField", table.Cells[0][2].Content) // width 12
+	assert.Equal(t, "field1", table.Cells[1][0].Content)     // width 3
+	assert.Equal(t, "1", table.Cells[1][1].Content)          // width 3
+	assert.Equal(t, "2.1", table.Cells[1][2].Content)        // width 5
 
-	assert.Equal(t, 30, complexCell.Width)
-	assert.Equal(t, 2, complexCell.Height)
+	assert.Equal(t, 38, complexCell.Width)
+	assert.Equal(t, 8, complexCell.Height)
 }
 
 func TestArrayOfStructsParser(t *testing.T) {
@@ -232,17 +232,17 @@ func TestArrayOfStructsParser(t *testing.T) {
 			t.Logf("row:%d col:%d = %v", rowIndex, colIndex, *col)
 			assert.NotNil(t, col)
 			if col.Position.Y != 0 {
-				assert.Equal(t, 10, col.Width)
-				assert.Equal(t, 1, col.Height)
+				assert.Equal(t, 12, col.Width)
+				assert.Equal(t, 3, col.Height)
 			} else {
-				assert.Equal(t, 1, col.Width)
-				assert.Equal(t, 1, col.Height)
+				assert.Equal(t, 3, col.Width)
+				assert.Equal(t, 3, col.Height)
 			}
 		}
 	}
 
-	assert.Equal(t, 31, complexCell.Width)
-	assert.Equal(t, 7, complexCell.Height)
+	assert.Equal(t, 41, complexCell.Width)
+	assert.Equal(t, 23, complexCell.Height)
 }
 
 func TestArrayParser(t *testing.T) {
@@ -274,11 +274,11 @@ func TestArrayParser(t *testing.T) {
 			t.Logf("main table: row:%d col:%d = %v", rowIndex, colIndex, *col)
 			assert.NotNil(t, col)
 			if colIndex != 0 {
-				assert.Equal(t, 31, col.Width)
-				assert.Equal(t, 7, col.Height)
+				assert.Equal(t, 41, col.Width)
+				assert.Equal(t, 23, col.Height)
 			} else {
-				assert.Equal(t, 1, col.Width)
-				assert.Equal(t, 7, col.Height)
+				assert.Equal(t, 3, col.Width)
+				assert.Equal(t, 23, col.Height)
 			}
 		}
 	}
@@ -295,17 +295,17 @@ func TestArrayParser(t *testing.T) {
 			t.Logf("nested table: row:%d col:%d = %v", rowIndex, colIndex, *col)
 			assert.NotNil(t, col)
 			if colIndex != 0 {
-				assert.Equal(t, 10, col.Width)
-				assert.Equal(t, 1, col.Height)
+				assert.Equal(t, 12, col.Width)
+				assert.Equal(t, 3, col.Height)
 			} else {
-				assert.Equal(t, 1, col.Width)
-				assert.Equal(t, 1, col.Height)
+				assert.Equal(t, 3, col.Width)
+				assert.Equal(t, 3, col.Height)
 			}
 		}
 	}
 
-	assert.Equal(t, 32, complexCell.Width)
-	assert.Equal(t, 7, complexCell.Height)
+	assert.Equal(t, 46, complexCell.Width)
+	assert.Equal(t, 25, complexCell.Height)
 }
 
 func TestMax(t *testing.T) {
