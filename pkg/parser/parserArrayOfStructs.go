@@ -116,15 +116,18 @@ func (c *Cell) parseArrayOfStructs(desc []reflect.Value) error {
 	for rowIndex, row := range table.Cells {
 		parentHeight += rowHeight[rowIndex]
 		for colIndex, cell := range row {
-			parentWidth += cellWidth[colIndex]
+			if rowIndex == 0 {
+				parentWidth += cellWidth[colIndex]
+			}
 
 			cell.Height = rowHeight[rowIndex]
 			cell.Width = cellWidth[colIndex]
 		}
 	}
 
-	c.Height = parentHeight
-	c.Width = parentWidth
+	// the +2 at the end is for borders
+	c.Height = parentHeight + 2
+	c.Width = parentWidth + 2
 
 	return nil
 }

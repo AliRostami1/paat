@@ -241,8 +241,9 @@ func (c *Cell) parseArray(desc reflect.Value) error {
 	}
 
 	// and finally we set the parent field to calculated height and width
-	c.Height = parentHeight
-	c.Width = indexCellWidth + valueCellWidth
+	// the +2 at the end is for borders
+	c.Height = parentHeight + 2
+	c.Width = indexCellWidth + valueCellWidth + 2
 
 	return nil
 }

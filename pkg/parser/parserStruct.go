@@ -46,9 +46,6 @@ func (c *Cell) parseStruct(desc reflect.Value) error {
 
 		table.Cells[0][index] = headerCell
 
-		cellWidth[index] = headerCell.Width
-		rowHeight[0] = max(rowHeight[0], headerCell.Height)
-
 		valueCell := &Cell{
 			ParentTable: table,
 			Position: Coordinate{
@@ -63,7 +60,8 @@ func (c *Cell) parseStruct(desc reflect.Value) error {
 		valueCell.parse(desc.FieldByName(structField.Name))
 		table.Cells[1][index] = valueCell
 
-		cellWidth[index] = max(cellWidth[index], valueCell.Width)
+		cellWidth[index] = max(headerCell.Width, valueCell.Width)
+		rowHeight[0] = max(rowHeight[0], headerCell.Height)
 		rowHeight[1] = max(rowHeight[1], valueCell.Height)
 	}
 
@@ -76,15 +74,18 @@ func (c *Cell) parseStruct(desc reflect.Value) error {
 	for rowIndex, row := range table.Cells {
 		parentHeight += rowHeight[rowIndex]
 		for colIndex, cell := range row {
-			parentWidth += cellWidth[colIndex]
+			if rowIndex == 0 {
+				parentWidth += cellWidth[colIndex]
+			}
 
 			cell.Height = rowHeight[rowIndex]
 			cell.Width = cellWidth[colIndex]
 		}
 	}
 
-	c.Height = parentHeight
-	c.Width = parentWidth
+	// the +2 at the end is for borders
+	c.Height = parentHeight + 2
+	c.Width = parentWidth + 2
 
 	return nil
 }

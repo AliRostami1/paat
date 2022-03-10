@@ -5,11 +5,6 @@ import (
 	"reflect"
 )
 
-type Desc struct {
-	reflect.Type
-	reflect.Value
-}
-
 func Parse(in interface{}) (*Cell, error) {
 	baseField := &Cell{
 		ParentTable: nil,
@@ -73,6 +68,7 @@ type Coordinate struct {
 type Cell struct {
 	ParentTable *Table
 	Position    Coordinate
+	Padding     int
 	Width       int
 	Height      int
 	Type        CellType
