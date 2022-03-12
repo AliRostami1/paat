@@ -6,7 +6,13 @@ import (
 )
 
 func stringWidth(str string) int {
-	return utf8.RuneCountInString(str)
+	var maxLineWidth int
+
+	lines := strings.Split(str, "\n")
+	for _, line := range lines {
+		maxLineWidth = max(maxLineWidth, utf8.RuneCountInString(line))
+	}
+	return maxLineWidth
 }
 
 func stringHeight(str string) int {

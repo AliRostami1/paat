@@ -26,5 +26,4 @@ func TestDraw(t *testing.T) {
 	assert.Equal(t, []byte("+----+"), c.Matrix[0])
 	assert.Equal(t, []byte("|test|"), c.Matrix[1])
 	assert.Equal(t, []byte("+----+"), c.Matrix[2])
-
 }

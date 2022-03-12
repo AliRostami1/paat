@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	testdata "github.com/AliRostami1/tabler/testdata/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -58,7 +59,21 @@ var testDataReflects = [...]reflect.Value{
 }
 
 func TestParser(t *testing.T) {
+	cell, err := Parse(testdata.ComplexTestData)
+	assert.Nil(t, err)
+	require.NotNil(t, cell)
 
+	assert.Equal(t, ComplexCell, cell.Type)
+	mainTable, ok := cell.Content.(*Table)
+	assert.True(t, ok)
+	assert.NotNil(t, mainTable)
+
+	assert.Equal(t, 2, len(mainTable.Cells))
+	assert.Equal(t, 7, len(mainTable.Cells[0]))
+	assert.Equal(t, 7, len(mainTable.Cells[1]))
+
+	logTable(t, mainTable, 0)
+	t.FailNow()
 }
 
 func TestCellParser(t *testing.T) {
@@ -194,7 +209,7 @@ func TestStructParser(t *testing.T) {
 	}
 
 	assert.Equal(t, "firstField", table.Cells[0][0].Content) // width 12
-	assert.Equal(t, "seconField", table.Cells[0][1].Content) // width 13
+	assert.Equal(t, "seconField", table.Cells[0][1].Content) // width 12
 	assert.Equal(t, "thirdField", table.Cells[0][2].Content) // width 12
 	assert.Equal(t, "field1", table.Cells[1][0].Content)     // width 3
 	assert.Equal(t, "1", table.Cells[1][1].Content)          // width 3
@@ -241,8 +256,8 @@ func TestArrayOfStructsParser(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, 41, complexCell.Width)
-	assert.Equal(t, 23, complexCell.Height)
+	assert.Equal(t, 41, complexCell.Width)  // 3 * 12 + 1 * 3 + 2
+	assert.Equal(t, 23, complexCell.Height) // 7 * 3 + 2
 }
 
 func TestArrayParser(t *testing.T) {
@@ -264,9 +279,8 @@ func TestArrayParser(t *testing.T) {
 	assert.True(t, ok)
 	require.NotNil(t, table)
 
-	assert.Equal(t, 2, len(table.Cells[0]))
-
-	assert.Equal(t, 1, len(table.Cells))
+	assert.Equal(t, 1, len(table.Cells))    // 1 row
+	assert.Equal(t, 2, len(table.Cells[0])) // 2 cols
 
 	for rowIndex, row := range table.Cells {
 		assert.Equal(t, 2, len(row))
@@ -314,4 +328,18 @@ func TestMax(t *testing.T) {
 	assert.Equal(t, 1000, max(10, 1000))
 	assert.Equal(t, -1, max(-1, -100))
 	assert.Equal(t, -1, max(-1, -1))
+}
+
+func logTable(t *testing.T, table *Table, nestingIndex int) {
+	for rowIndex := 0; rowIndex < len(table.Cells); rowIndex += 1 {
+		for colIndex := 0; colIndex < len(table.Cells[rowIndex]); colIndex += 1 {
+			cell := table.Cells[rowIndex][colIndex]
+			t.Logf("nestingIndex:%d row:%d col:%d = {width: %d, height: %d, Content: %v}", nestingIndex, rowIndex, colIndex, cell.Width, cell.Height, cell.Content)
+			if cell.Type == ComplexCell {
+				nestedTable, ok := cell.Content.(*Table)
+				assert.True(t, ok)
+				logTable(t, nestedTable, nestingIndex+1)
+			}
+		}
+	}
 }

@@ -44,13 +44,15 @@ func (c *Canvas) drawer(cell *Cell, x, y int) {
 		currentX := x
 		for i := 0; i < len(table.Cells); i += 1 {
 			if i > 0 {
-				currentX += table.Cells[i][0].Height
+				currentX += table.Cells[i-1][0].Height
 			}
 			currentY := y
 			for j := 0; j < len(table.Cells[i]); j += 1 {
 				if j > 0 {
-					currentY += table.Cells[i][j].Width
+					currentY += table.Cells[i][j-1].Width
 				}
+				// if i > 0
+
 				c.drawer(table.Cells[i][j], currentX, currentY)
 			}
 		}
@@ -119,7 +121,8 @@ func makeContentByteArray(s string, w int) (b []byte) {
 		leadingEmptyBytes  int
 		trailingEmptyBytes int
 	)
-	mod, emptyBytesEach := (w-2-len(s))%2, (w-2-len(s))/2
+
+	mod, emptyBytesEach := (w-2-stringWidth(s))%2, (w-2-stringWidth(s))/2
 	leadingEmptyBytes = emptyBytesEach + mod
 	trailingEmptyBytes = emptyBytesEach
 
