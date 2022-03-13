@@ -97,6 +97,9 @@ func (c *Cell) parserMap(in reflect.Value) error {
 	return nil
 }
 func (c *Cell) parserStruct(in reflect.Value) error {
+
+	in = extractInterface(in)
+
 	// it's an array so the type of the parent Cell whould be
 	// ComplexCell which indicates there is a Table in it's
 	// contetnt field
@@ -150,6 +153,8 @@ func (c *Cell) parserStruct(in reflect.Value) error {
 }
 
 func (c *Cell) parserArray(in reflect.Value) error {
+	in = extractInterface(in)
+
 	// first col will be indexes
 	// second col will be values
 	// values themselves can be
@@ -165,12 +170,11 @@ func (c *Cell) parserArray(in reflect.Value) error {
 	categorizedArray := [][]reflect.Value{}
 	uncategorizedArray := []reflect.Value{}
 
+	in = extractInterface(in)
+
 	for i := 0; i < in.Len(); i += 1 {
-		index := in.Index(i)
-		if index.Type().Kind() == reflect.Interface {
-			interfaceRep := index.Interface()
-			index = reflect.ValueOf(interfaceRep)
-		}
+		index := extractInterface(in.Index(i))
+
 		kind := index.Type().Kind()
 		if kind == reflect.Struct {
 			assigned := false
@@ -362,6 +366,9 @@ func (c *Cell) parserArray(in reflect.Value) error {
 }
 
 func (c *Cell) parserArrayOfStructs(in []reflect.Value) error {
+	for i := range in {
+		in[i] = extractInterface(in[i])
+	}
 	// first row will be keys
 	// second row forward will be value
 	// value itself can be complex or primitive

@@ -15,6 +15,8 @@ func Parse(in interface{}) (*Cell, error) {
 
 func (c *Cell) parse(in reflect.Value) (err error) {
 	switch in.Type().Kind() {
+	case reflect.Interface:
+		err = c.parse(extractInterface(in))
 	case reflect.Array, reflect.Slice:
 		// its an iteratable type
 		err = c.parserArray(in)
@@ -125,6 +127,10 @@ func (c *Cell) SetBorderBoxWidth(bbw int) {
 
 func (c *Cell) SetHeight(h int) {
 	c.Height = h
+
+	// if c.Type == PrimitiveCell {
+	// 	str := c.Content.(string)
+	// }
 
 	if c.Type == MapCell || c.Type == StructCell || c.Type == ArrayCell || c.Type == ArrayOfStructsCell {
 		content := c.Content.(*Table)

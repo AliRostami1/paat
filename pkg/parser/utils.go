@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"reflect"
 	"strings"
 	"unicode/utf8"
 )
@@ -39,4 +40,11 @@ func max(firstNum, secondNum int) int {
 		return firstNum
 	}
 	return secondNum
+}
+
+func extractInterface(in reflect.Value) reflect.Value {
+	if in.Type().Kind() == reflect.Interface {
+		return reflect.ValueOf(in.Interface())
+	}
+	return in
 }
