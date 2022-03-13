@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/AliRostami1/tabler/pkg/parser"
-	"github.com/AliRostami1/tabler/testdata/go"
+	"github.com/AliRostami1/tabler/testdata"
 )
 
 func main() {
@@ -18,6 +18,7 @@ func main() {
 	fmt.Print(canvas.String())
 
 	c, err = parser.Parse("testsds\ntest\ntest\ntest\ntest")
+	// fmt.Printf("%#+v", *c)
 	if err != nil {
 		log.Fatalf("parser: %v", err)
 	}

@@ -10,6 +10,7 @@ type Canvas struct {
 
 func (c *Canvas) String() string {
 	sb := strings.Builder{}
+	sb.WriteByte('\n')
 	for _, row := range c.Matrix {
 		for _, col := range row {
 			sb.WriteByte(col)
@@ -22,9 +23,9 @@ func (c *Canvas) String() string {
 
 func (cell *Cell) Draw() *Canvas {
 	// build the matrix and initilize it
-	var runeMatrix [][]byte = make([][]byte, cell.Height)
+	var runeMatrix [][]byte = make([][]byte, cell.BorderBoxHeight())
 	for i := range runeMatrix {
-		runeMatrix[i] = make([]byte, cell.Width)
+		runeMatrix[i] = make([]byte, cell.BorderBoxWidth())
 	}
 
 	canvas := &Canvas{
@@ -38,20 +39,19 @@ func (cell *Cell) Draw() *Canvas {
 
 func (c *Canvas) drawer(cell *Cell, x, y int) {
 	if cell.Type == PrimitiveCell {
-		c.drawContent(cell.Content.(string), x, y, cell.Width, cell.Height)
+		c.drawContent(cell, x, y)
 	} else {
 		table := cell.Content.(*Table)
 		currentX := x
-		for i := 0; i < len(table.Cells); i += 1 {
+		for i := range table.Cells {
 			if i > 0 {
-				currentX += table.Cells[i-1][0].Height
+				currentX += table.Cells[i-1][0].BorderBoxHeight()
 			}
 			currentY := y
-			for j := 0; j < len(table.Cells[i]); j += 1 {
+			for j := range table.Cells[i] {
 				if j > 0 {
-					currentY += table.Cells[i][j-1].Width
+					currentY += table.Cells[i][j-1].BorderBoxWidth()
 				}
-				// if i > 0
 
 				c.drawer(table.Cells[i][j], currentX, currentY)
 			}
@@ -59,8 +59,8 @@ func (c *Canvas) drawer(cell *Cell, x, y int) {
 	}
 }
 
-func (c *Canvas) drawContent(s string, x, y, width, height int) {
-	contentMatrix := parseContent(s, width, height)
+func (c *Canvas) drawContent(cell *Cell, x, y int) {
+	contentMatrix := parseContent(cell)
 
 	for contentRowIndex, row := range contentMatrix {
 		for contentColIndex, col := range row {
@@ -69,20 +69,13 @@ func (c *Canvas) drawContent(s string, x, y, width, height int) {
 	}
 }
 
-func parseContent(s string, w, h int) [][]byte {
-	var byteMatrix [][]byte = make([][]byte, h)
-	for i := range byteMatrix {
-		byteMatrix[i] = make([]byte, w)
-	}
+func parseContent(cell *Cell) [][]byte {
+	s := cell.Content.(string)
 
-	byteMatrix[0][0] = '+'
-	byteMatrix[0][w-1] = '+'
-	byteMatrix[h-1][0] = '+'
-	byteMatrix[h-1][w-1] = '+'
+	byteMatrix := [][]byte{}
 
-	for i := 1; i < w-1; i += 1 {
-		byteMatrix[0][i] = '-'
-		byteMatrix[h-1][i] = '-'
+	if cell.Border.Top > 0 {
+		byteMatrix = append(byteMatrix, makeHorizontalBorder(cell.Width, cell.Border))
 	}
 
 	lines := strings.Split(s, "\n")
@@ -91,51 +84,76 @@ func parseContent(s string, w, h int) [][]byte {
 		leadingEmptyLines  int
 		trailingEmptyLines int
 	)
-	mod, emptyLinesEach := (h-2-len(lines))%2, (h-2-len(lines))/2
+	mod, emptyLinesEach := (cell.Height-len(lines))%2, (cell.Height-len(lines))/2
 	leadingEmptyLines = emptyLinesEach + mod
 	trailingEmptyLines = emptyLinesEach
 
-	for i := 1; i < h-1; i += 1 {
-		if i <= leadingEmptyLines || i >= h-1-trailingEmptyLines {
-			byteMatrix[i] = makeEmptyByteArray(w)
+	for i := 0; i < cell.Height; i += 1 {
+		if i < leadingEmptyLines || i >= cell.Height-trailingEmptyLines {
+			byteMatrix = append(byteMatrix, makeEmptyByteArray(cell.Width, cell.Border))
 		} else {
-			byteMatrix[i] = makeContentByteArray(lines[i-1-leadingEmptyLines], w)
+			byteMatrix = append(byteMatrix, makeContentByteArray(lines[i-leadingEmptyLines], cell.Width, cell.Border))
 		}
+	}
+
+	if cell.Border.Bottom > 0 {
+		byteMatrix = append(byteMatrix, makeHorizontalBorder(cell.Width, cell.Border))
 	}
 
 	return byteMatrix
 }
 
-func makeEmptyByteArray(length int) (b []byte) {
-	b = append(b, '|')
-	for i := 1; i < length-1; i += 1 {
-		b = append(b, ' ')
+func makeHorizontalBorder(length int, border Border) (b []byte) {
+	if border.Left > 0 {
+		b = append(b, '+')
 	}
-	b = append(b, '|')
+	for i := 0; i < length; i += 1 {
+		b = append(b, '-')
+	}
+	if border.Right > 0 {
+		b = append(b, '+')
+	}
 	return
 }
 
-func makeContentByteArray(s string, w int) (b []byte) {
+func makeEmptyByteArray(length int, border Border) (b []byte) {
+	if border.Left > 0 {
+		b = append(b, '|')
+	}
+	for i := 0; i < length; i += 1 {
+		b = append(b, ' ')
+	}
+	if border.Right > 0 {
+		b = append(b, '|')
+	}
+	return
+}
+
+func makeContentByteArray(s string, w int, border Border) (b []byte) {
 	str := []byte(s)
 	var (
 		leadingEmptyBytes  int
 		trailingEmptyBytes int
 	)
 
-	mod, emptyBytesEach := (w-2-stringWidth(s))%2, (w-2-stringWidth(s))/2
+	mod, emptyBytesEach := (w-stringWidth(s))%2, (w-stringWidth(s))/2
 	leadingEmptyBytes = emptyBytesEach + mod
 	trailingEmptyBytes = emptyBytesEach
 
-	b = append(b, '|')
+	if border.Left > 0 {
+		b = append(b, '|')
+	}
 
-	for i := 1; i < w-1; i += 1 {
-		if i <= leadingEmptyBytes || i >= w-1-trailingEmptyBytes {
+	for i := 0; i < w; i += 1 {
+		if i < leadingEmptyBytes || i >= w-trailingEmptyBytes {
 			b = append(b, ' ')
 		} else {
-			b = append(b, str[i-leadingEmptyBytes-1])
+			b = append(b, str[i-leadingEmptyBytes])
 		}
 	}
 
-	b = append(b, '|')
+	if border.Right > 0 {
+		b = append(b, '|')
+	}
 	return
 }
