@@ -25,23 +25,6 @@ func (c *Cell) parserPrimitive(in interface{}) error {
 	// in the string reperesntation of it
 	// the +2 at the end is for borders on top and bottom sides
 	c.Height = stringHeight(strRep)
-
-	// for borders we need to first know if the Cell has neighbours
-	// on top and left side of it. right and left side will haver
-	// borders no matter what
-	c.Border.Right = 1
-	c.Border.Bottom = 1
-	if c.Row == 0 {
-		// if row is 0 the it does not have any cells on it's
-		// top side and we need borders on that side
-		c.Border.Top = 1
-	}
-	if c.Col == 0 {
-		// if col is 0 the it does not have any cells on it's
-		//left side and we need borders on that side
-		c.Border.Left = 1
-	}
-
 	return nil
 }
 func (c *Cell) parserMap(in reflect.Value) error {
@@ -67,11 +50,11 @@ func (c *Cell) parserMap(in reflect.Value) error {
 	mapKeys := in.MapKeys()
 
 	for index, mapKey := range mapKeys {
-		headerCell := newCell(index, 0)
+		headerCell := c.newCell(index, 0)
 		headerCell.parserPrimitive(mapKey)
 		table.Cells[index][0] = headerCell
 
-		valueCell := newCell(index, 1)
+		valueCell := c.newCell(index, 1)
 		valueCell.parse(in.MapIndex(mapKey))
 		table.Cells[index][1] = valueCell
 
@@ -123,11 +106,11 @@ func (c *Cell) parserStruct(in reflect.Value) error {
 	structFields := reflect.VisibleFields(in.Type())
 
 	for index, structField := range structFields {
-		headerCell := newCell(0, index)
+		headerCell := c.newCell(0, index)
 		headerCell.parserPrimitive(structField.Name)
 		table.Cells[0][index] = headerCell
 
-		valueCell := newCell(1, index)
+		valueCell := c.newCell(1, index)
 		valueCell.parse(in.FieldByName(structField.Name))
 		table.Cells[1][index] = valueCell
 
@@ -231,7 +214,7 @@ func (c *Cell) parserArray(in reflect.Value) error {
 	for catIndex, category := range categorizedArray {
 		// the first col is the index Cell
 		// which is a PrimitiveCell
-		indexCell := newCell(catIndex, 0)
+		indexCell := c.newCell(catIndex, 0)
 
 		// parsing the indexCell itself, this is where
 		// recursion happens
@@ -251,7 +234,7 @@ func (c *Cell) parserArray(in reflect.Value) error {
 		// the second col is the value Cell
 		// which can be a PrimitiveCell or
 		// a ComplexCell
-		valueCell := newCell(catIndex, 1)
+		valueCell := c.newCell(catIndex, 1)
 		// parsing the valueCell itself, this is where
 		// recursion happens
 		// in this case we don't know the value's type
@@ -292,7 +275,7 @@ func (c *Cell) parserArray(in reflect.Value) error {
 		index := len(categorizedArray) + i
 		// the first col is the index Cell
 		// which is a PrimitiveCell
-		indexCell := newCell(index, 0)
+		indexCell := c.newCell(index, 0)
 		// parsing the indexCell itself, this is where
 		// recursion happens
 		// in this case .parse will call .primitiveParse
@@ -311,7 +294,7 @@ func (c *Cell) parserArray(in reflect.Value) error {
 		// the second col is the value Cell
 		// which can be a PrimitiveCell or
 		// a ComplexCell
-		valueCell := newCell(index, 1)
+		valueCell := c.newCell(index, 1)
 
 		// parsing the valueCell itself, this is where
 		// recursion happens
@@ -390,7 +373,7 @@ func (c *Cell) parserArrayOfStructs(in []reflect.Value) error {
 		rowHeight []int = make([]int, len(in)+1)
 	)
 
-	hashCell := newCell(0, 0)
+	hashCell := c.newCell(0, 0)
 	hashCell.parserPrimitive("#")
 
 	table.Cells[0][0] = hashCell
@@ -399,7 +382,7 @@ func (c *Cell) parserArrayOfStructs(in []reflect.Value) error {
 	rowHeight[0] = hashCell.BorderBoxHeight()
 
 	for index, structField := range structFields {
-		headerCell := newCell(0, index+1)
+		headerCell := c.newCell(0, index+1)
 		headerCell.parserPrimitive(structField.Name)
 
 		table.Cells[0][index+1] = headerCell
@@ -409,7 +392,7 @@ func (c *Cell) parserArrayOfStructs(in []reflect.Value) error {
 	}
 
 	for rowIndex, row := range in {
-		indexCell := newCell(rowIndex+1, 0)
+		indexCell := c.newCell(rowIndex+1, 0)
 		indexCell.parserPrimitive(rowIndex + 1)
 
 		table.Cells[rowIndex+1][0] = indexCell
@@ -418,7 +401,7 @@ func (c *Cell) parserArrayOfStructs(in []reflect.Value) error {
 		rowHeight[rowIndex+1] = indexCell.BorderBoxHeight()
 
 		for colIndex, structField := range structFields {
-			valueCell := newCell(rowIndex+1, colIndex+1)
+			valueCell := c.newCell(rowIndex+1, colIndex+1)
 			valueCell.parse(row.FieldByName(structField.Name))
 
 			table.Cells[rowIndex+1][colIndex+1] = valueCell

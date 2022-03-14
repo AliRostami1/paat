@@ -9,7 +9,8 @@ import (
 )
 
 func TestParserPrimitive(t *testing.T) {
-	c := newCell(0, 0)
+	c := initCell()
+
 	err := c.parserPrimitive("#")
 	assert.Nil(t, err)
 	assert.Equal(t, PrimitiveCell, c.Type)
@@ -26,7 +27,8 @@ func TestParserPrimitive(t *testing.T) {
 }
 
 func TestParserMap(t *testing.T) {
-	c := newCell(0, 0)
+	c := initCell()
+
 	err := c.parserMap(reflect.ValueOf(testdata.MapOfIntTestData))
 	assert.Nil(t, err)
 	assert.Equal(t, MapCell, c.Type)
@@ -55,7 +57,8 @@ func TestParserMap(t *testing.T) {
 }
 
 func TestParserStruct(t *testing.T) {
-	c := newCell(0, 0)
+	c := initCell()
+
 	err := c.parserStruct(reflect.ValueOf(testdata.StructTestData))
 	assert.Nil(t, err)
 	assert.Equal(t, StructCell, c.Type)
@@ -84,7 +87,8 @@ func TestParserStruct(t *testing.T) {
 }
 
 func TestParserArrayOfStructs(t *testing.T) {
-	c := newCell(0, 0)
+	c := initCell()
+
 	err := c.parserArrayOfStructs(testdata.ArrayOfStructsDataReflect)
 	assert.Nil(t, err)
 	assert.Equal(t, ArrayOfStructsCell, c.Type)
@@ -117,7 +121,8 @@ func TestParserArrayOfStructs(t *testing.T) {
 }
 
 func TestParserArray(t *testing.T) {
-	c := newCell(0, 0)
+	c := initCell()
+
 	err := c.parserArray(reflect.ValueOf(testdata.ArrayTestData))
 	assert.Nil(t, err)
 	assert.Equal(t, ArrayCell, c.Type)
@@ -151,4 +156,13 @@ func testBorder(t *testing.T, c *Cell, rowIndex, colIndex int) {
 	}
 	assert.Equal(t, 1, c.Border.Bottom)
 	assert.Equal(t, 1, c.Border.Right)
+}
+
+func initCell() *Cell {
+	baseField := &Cell{
+		Location: Location{0, 0},
+		Border:   Border{1, 1, 1, 1},
+		Content:  nil,
+	}
+	return baseField.newCell(0, 0)
 }

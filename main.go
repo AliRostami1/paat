@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/AliRostami1/tabler/pkg/parser"
-	"golang.org/x/term"
 )
 
 func main() {
@@ -57,12 +56,12 @@ func main() {
 		log.Fatal("invalid json")
 	}
 
-	ttyWidth, ttyHeight, err := term.GetSize(int(os.Stdin.Fd()))
-	if err != nil {
-		log.Fatalf("getting terminal dimensions: %v", err)
-	}
+	// ttyWidth, ttyHeight, err := term.GetSize(int(os.Stdin.Fd()))
+	// if err != nil {
+	// 	log.Fatalf("getting terminal dimensions: %v", err)
+	// }
 
-	log.Printf("terminal width=%d, height=%d", ttyWidth, ttyHeight)
+	// log.Printf("terminal width=%d, height=%d", ttyWidth, ttyHeight)
 
 	// if cell.BorderBoxWidth() > ttyWidth {
 	// 	cell.SetBorderBoxWidth(ttyWidth - 1)

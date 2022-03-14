@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"log"
 	"strings"
 )
 
@@ -71,10 +70,7 @@ func (c *Canvas) drawContent(cell *Cell, x, y int) {
 }
 
 func parseContent(cell *Cell) [][]byte {
-	s, ok := cell.Content.(string)
-	if !ok {
-		log.Printf("s: %v", cell.Content)
-	}
+	s := cell.Content.(string)
 
 	byteMatrix := [][]byte{}
 

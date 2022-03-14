@@ -6,7 +6,11 @@ import (
 )
 
 func Parse(in interface{}) (*Cell, error) {
-	baseField := &Cell{}
+	baseField := &Cell{
+		Location: Location{0, 0},
+		Border:   Border{1, 1, 1, 1},
+		Content:  nil,
+	}
 
 	err := baseField.parse(reflect.ValueOf(in))
 
@@ -85,12 +89,13 @@ type Cell struct {
 	Content interface{}
 }
 
-func newCell(row, col int) *Cell {
+func (c *Cell) newCell(row, col int) *Cell {
 	return &Cell{
 		Location: Location{
 			Row: row,
 			Col: col,
 		},
+		Border: calcBorder(c.Border, row, col),
 	}
 }
 
@@ -121,8 +126,11 @@ func (c *Cell) SetWidth(w int) {
 }
 
 func (c *Cell) SetBorderBoxWidth(bbw int) {
-	w := bbw - c.Border.Left - c.Border.Right
-	c.SetWidth(w)
+	pureWidth := bbw
+	if c.Type == PrimitiveCell {
+		pureWidth = bbw - c.Border.Left - c.Border.Right
+	}
+	c.SetWidth(pureWidth)
 }
 
 func (c *Cell) SetHeight(h int) {
@@ -149,7 +157,10 @@ func (c *Cell) SetHeight(h int) {
 }
 
 func (c *Cell) SetBorderBoxHeight(bbh int) {
-	pureHeight := bbh - c.Border.Top - c.Border.Bottom
+	pureHeight := bbh
+	if c.Type == PrimitiveCell {
+		pureHeight = bbh - c.Border.Top - c.Border.Bottom
+	}
 	c.SetHeight(pureHeight)
 }
 
