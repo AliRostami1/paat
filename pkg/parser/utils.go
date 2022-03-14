@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"log"
 	"reflect"
 	"strings"
 	"unicode/utf8"
@@ -34,10 +33,6 @@ func distributeLength(targetLength int, currentLengths []int) []int {
 	for i := 0; i < targetLength-tSum; i += 1 {
 		t[i] += 1
 	}
-
-	tSum = sumOfSlice(t)
-
-	log.Printf("targetLength:%d | tSum:%d", targetLength, tSum)
 
 	return t
 }
