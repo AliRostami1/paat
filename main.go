@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/AliRostami1/tabler/pkg/parser"
-	"github.com/AliRostami1/tabler/testdata/go"
+	"github.com/AliRostami1/paat/pkg/parser"
+	testdata "github.com/AliRostami1/paat/testdata/go"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	testdata "github.com/AliRostami1/tabler/testdata/go"
+	testdata "github.com/AliRostami1/paat/testdata/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

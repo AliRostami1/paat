@@ -1,4 +1,4 @@
-module github.com/AliRostami1/tabler
+module github.com/AliRostami1/paat
 
 go 1.17
 
